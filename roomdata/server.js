@@ -101,7 +101,7 @@
 		if (rackSysid.length > 0){
 			var grAlmHardware = new GlideRecord('alm_hardware');
 			grAlmHardware.addQuery('u_rack', 'IN', rackSysid);
-			grAlmHardware.setLimit(100);
+			grAlmHardware.setLimit(1000);
 			grAlmHardware.query();
 			while (grAlmHardware.next()) {
 				hardwareData.push({
@@ -159,6 +159,7 @@
 			finalData['ROOM']['racks'][rack]['rackmounted'] = tempHardware[0];
 			finalData['ROOM']['racks'][rack]['pdu'] = tempHardware[1];
 			finalData['ROOM']['racks'][rack]['unmatched'] = tempHardware[2];
+			finalData['ROOM']['racks'][rack]['orphans'] = tempHardware[3];
 		})
 		return finalData;
 	}
@@ -180,10 +181,8 @@
 		var childName = '';
 		var unmatchedName = '';
 		var tempChildren = [];
-		
-		
-		
-		var orphans = [];
+		var orphans = {};
+		var orphanName = '';
 		
 		/*
 					asset_tag: grAlmHardware.asset_tag.getValue(),
@@ -251,7 +250,13 @@
     })
     uncheckedChildren.forEach(function(child){
       if (rackMountedSysidList.indexOf(child['parent_sys_id']) < 0){
-        orphans.push(child);
+			  if (child['model_category_name']){
+				  prefix = 'ORPHAN_' + child['model_category_name'].toUpperCase().replace(" ", "_");
+			  } else {
+				  prefix = 'ORPHAN_UNCATEGORISED';
+			  }
+				orphanName = prefix + '_' + child['sys_id'];
+        orphans[orphanName] = child;
       } else {
         children.push(child);
       }
@@ -274,7 +279,7 @@
 				}
 			});
 			// collision test children
-			
+			tempChildren = childCollisionTest(tempChildren);
 			// add tested children to rackmount
 			tempChildren.forEach(function(child){
 			    if (child['model_category_name']){
@@ -286,10 +291,19 @@
 					rackData[rackmountName]['children'][childName] = child;
 			});
 		});
-		return [rackData,pduData,unmatched,children];
+		return [rackData,pduData,unmatched,orphans];
 	}
 	
 	function rackmountCollisionTest(rackMounted){
+		var tested = [];
+		rackMounted.forEach(function(object){
+			object['collision'] = false;
+			tested.push(object);
+		});
+		return tested;
+	}
+	
+	function childCollisionTest(rackMounted){
 		var tested = [];
 		rackMounted.forEach(function(object){
 			object['collision'] = false;
