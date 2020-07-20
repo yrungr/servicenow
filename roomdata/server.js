@@ -10,7 +10,7 @@
 	// generate room plan
 	if (roomSysid){
 		basicRoomData = generateBasicRoom(roomSysid);
-		rackGeometryData = rackGeometry(basicRoomData,roomSysid);
+		//rackGeometryData = rackGeometry(basicRoomData,roomSysid);
 		unsortedHardware = getHardWare(basicRoomData);
 		finalData = generateFinalData(basicRoomData,rackGeometryData,unsortedHardware);
 		data.output = finalData;
@@ -101,7 +101,7 @@
 		if (rackSysid.length > 0){
 			var grAlmHardware = new GlideRecord('alm_hardware');
 			grAlmHardware.addQuery('u_rack', 'IN', rackSysid);
-			grAlmHardware.setLimit(1000);
+			//grAlmHardware.setLimit(1000);
 			grAlmHardware.query();
 			while (grAlmHardware.next()) {
 				hardwareData.push({
@@ -151,10 +151,10 @@
 			finalData['ROOM']['racks'][rack]['sys_id'] = rackSysid;
 			finalData['ROOM']['racks'][rack]['rackmounted'] = {};
 			finalData['ROOM']['racks'][rack]['unsorted'] = {};
-			finalData['ROOM']['racks'][rack]['xpos'] = rackGeometryData[rackSysid]['xpos'];
-			finalData['ROOM']['racks'][rack]['ypos'] = rackGeometryData[rackSysid]['ypos'];
-			finalData['ROOM']['racks'][rack]['xsize'] = rackGeometryData[rackSysid]['xsize'];
-			finalData['ROOM']['racks'][rack]['ysize'] = rackGeometryData[rackSysid]['ysize'];
+			//finalData['ROOM']['racks'][rack]['xpos'] = rackGeometryData[rackSysid]['xpos'];
+			//finalData['ROOM']['racks'][rack]['ypos'] = rackGeometryData[rackSysid]['ypos'];
+			//finalData['ROOM']['racks'][rack]['xsize'] = rackGeometryData[rackSysid]['xsize'];
+			//finalData['ROOM']['racks'][rack]['ysize'] = rackGeometryData[rackSysid]['ysize'];
 			tempHardware = processRackHardware(unsortedHardware,rackSysid);
 			finalData['ROOM']['racks'][rack]['rackmounted'] = tempHardware[0];
 			finalData['ROOM']['racks'][rack]['pdu'] = tempHardware[1];
